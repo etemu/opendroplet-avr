@@ -19,7 +19,7 @@
 #define MICPIN A0    // Analog input pin where the mic is attached to
 #define OUTPIN 13    // Analog output pin, LED for testing purposes
 
-// Parameters: number of pixels in strip, pin number, pixel type flags, add together as needed:
+// Parameters: number of LEDs attached, pin number, pixel type flags, add together as needed:
 //   NEO_KHZ800  800 KHz bitstream (most NeoPixel products w/WS2812 LEDs)
 //   NEO_KHZ400  400 KHz (classic 'v1' (not v2) FLORA pixels, WS2811 drivers)
 //   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
@@ -37,8 +37,10 @@ void setup() {
   pinMode(MICPIN,INPUT);
   pinMode(OUTPIN,OUTPUT);
 
-
-  ledoff();
+  neoled.setPixelColor(0, 255,255,255);
+  delay(250);
+  neoled.setPixelColor(0,32,32,32);
+  //ledoff();
 }
 
 void led(uint8_t _mode=0){
