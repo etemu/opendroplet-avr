@@ -14,8 +14,8 @@
  
 #include <Adafruit_NeoPixel.h>
 
-#define LEDPIN 2
-#define LEDPIXEL 1
+#define LEDPIN 2     // PortPin where the LED pixels are attached/daisy chained
+#define LEDPIXEL 1   // Number of LED pixels attached
 #define MICPIN A0    // Analog input pin where the mic is attached to
 #define OUTPIN 13    // Analog output pin, LED for testing purposes
 
@@ -24,7 +24,7 @@
 //   NEO_KHZ400  400 KHz (classic 'v1' (not v2) FLORA pixels, WS2811 drivers)
 //   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
-Adafruit_NeoPixel neoled = Adafruit_NeoPixel(LEDPIXEL, LEDPIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(LEDPIXEL, LEDPIN, NEO_GRB + NEO_KHZ800);
 
 int mic = 0;              // value read from the mic
 int lastmic = 0;          // previous reading from the mic
@@ -37,22 +37,22 @@ void setup() {
   pinMode(MICPIN,INPUT);
   pinMode(OUTPIN,OUTPUT);
 
-  neoled.setPixelColor(0, 255,255,255);
+  strip.setPixelColor(0, 255,255,255);
   delay(250);
-  neoled.setPixelColor(0,32,32,32);
+  strip.setPixelColor(0,32,32,32);
   //ledoff();
 }
 
 void led(uint8_t _mode=0){
   uint16_t r,g,b = 0;
-  for(uint16_t l = 0; l < LEDPIXEL; l++) {
-      neoled.setPixelColor(l, r, g, b);
+  for(uint16_t _l = 0; _l < LEDPIXEL; _l++) {
+      strip.setPixelColor(_l, r, g, b);
     }
 }
 
 void ledoff(){
-    for(uint16_t l = 0; l < LEDPIXEL; l++) {
-      neoled.setPixelColor(l, 0, 0, 0);
+    for(uint16_t _l = 0; _l < LEDPIXEL; _l++) {
+      strip.setPixelColor(_l, 0, 0, 0);
     }
 }
 
