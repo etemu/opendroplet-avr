@@ -9,7 +9,7 @@
 
 // Change these values according to your network setup:
 static byte nodeID = 7; // range: 2-254
-static byte UID[] = { 255, 242, 255, 255, 255, nodeID }; // choose a UID
+static byte uid[] = { 255, 242, 255, 255, 255, nodeID }; // choose a UID
 static byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, nodeID }; // choose a unique MAC (optional, only if ethernet used)
 static byte ip[] = { 192, 168, 8, nodeID }; // your subnet IP scheme (optional, only if ethernet used)
 static byte gw[] = { 192, 168, 8, 1}; // your gateway (optional, only if ethernet used)
@@ -30,7 +30,7 @@ void loop()
 }
 
 void SaveData(){
-  while (addr < 21){
+  while (addr < sizeof(val)){
   EEPROM.write(addr, val[addr]);
   // advance to the next address. 
   addr++;
