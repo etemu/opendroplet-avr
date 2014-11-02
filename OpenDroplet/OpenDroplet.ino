@@ -16,6 +16,8 @@
 #include <EEPROM.h>
 #include <avr/sleep.h>
 #include <avr/power.h>
+#include <avr/wdt.h>            // the UNO bootloader 
+#include <RFu_JeeLib.h> 
 
 #define DEBUG 1 				// debug mode with verbose output over serial at 115200 bps
 #define USE_EEPROM 				// read nodeID and network settings from EEPROM at bootup
@@ -52,6 +54,14 @@ void setup() {
   delay(250);
   strip.setPixelColor(0,32,32,32);
   //ledoff();
+}
+
+void send_rf_data()
+{
+  rf12_sleep(RF12_WAKEUP);
+  rf12_sendNow(0, &emontx, sizeof emontx);  // send out the packet
+  rf12_sendWait(2);
+  rf12_sleep(RF12_SLEEP);
 }
 
 void led(uint8_t _mode=0){
