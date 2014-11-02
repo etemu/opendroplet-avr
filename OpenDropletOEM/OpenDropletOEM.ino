@@ -48,7 +48,6 @@ const int networkGroup = 210;                                           // emonT
 #define RF69_COMPAT 0 // set to 1 to use RFM69CW 
 #include <JeeLib.h>   // make sure V12 (latest) is used if using RFM69CW
 #include "EmonLib.h"
-EnergyMonitor ct1,ct2,ct3,ct4;                                          // Create  instances for each CT channel
 
 typedef struct { unsigned int uid, spl, vbat;} PayloadTX;      			// create structure - a neat way of packaging data for RF comms
 PayloadTX emontx;                                                       
@@ -100,8 +99,9 @@ void loop()
   
   emontx.uid = uid; 
   
-  Serial.print(" "); Serial.print(ct1.Vrms);
-  
+  Serial.print(" "); Serial.print(emontx.uid);
+  Serial.print(" "); Serial.print(emontx.spl);
+  Serial.print(" "); Serial.print(emontx.vbat);
   Serial.println(); delay(100);
 
   // because millis() returns to zero after 50 days ! 
@@ -111,7 +111,7 @@ void loop()
   { 
     send_rf_data();                                                       // *SEND RF DATA* - see emontx_lib
     digitalWrite(LEDpin, HIGH); delay(20); digitalWrite(LEDpin, LOW);      // flash LED
-    delay(2000);                                                          // delay between readings in ms
+    delay(200);                                                          // delay between readings in ms
   }
 }
 
