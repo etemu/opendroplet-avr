@@ -13,7 +13,7 @@ Open Droplet prototyping
  3. for a bare virgin micro controller or if the board is bricked, use an ICSP connection and
     1. flash the compiled .hex file with avrdude or
     2. flash the DualOptiboot (TODO: insert link here) bootloader to your microcontroller. You may then use a serial connection to upload the actual firmware, see 4.i-ii.
-   
+4. Upload the OpenDropletOEM/OpenDropletOEM.ino to the microcontroller.
 ## Usage
 
 The EEPROM contains a UID, a unique identification which will be sent out with every packet, to distinguish between adjascent sensors that are in range, for debugging purposes and for a unique assignment in the cloud. You can disable the UID in the flash code or if you fill the EEPROM address with zeros.
