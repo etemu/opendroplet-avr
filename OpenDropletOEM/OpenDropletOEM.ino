@@ -41,7 +41,7 @@ byte mode = 0;							// power mode
 unsigned long lastActive = 0;
 unsigned long uid = 42;
 
-const int sampleWindow = 50; // Sample window width in mS (50 mS = 20Hz)
+const int sampleWindow = 2000; // Sample window width in mS (50 mS = 20Hz)
 unsigned int sample;
 
 #define RF_freq RF12_433MHZ                                                // Frequency of RF12B module can be RF12_433MHZ, RF12_868MHZ or RF12_915MHZ. You should use the one matching the module you have.
@@ -73,10 +73,10 @@ void setup()
   if (RF_freq == RF12_433MHZ) Serial.print("433Mhz");
   if (RF_freq == RF12_868MHZ) Serial.print("868Mhz");
   if (RF_freq == RF12_915MHZ) Serial.print("915Mhz"); 
- Serial.print(" network group: "); 
+  Serial.print(" network group: "); 
   Serial.println(networkGroup);
   // }
-   
+  delay(1000);
   rf12_initialize(nodeID, RF_freq, networkGroup);               // initialize RFM12B
   rf12_sleep(RF12_SLEEP);										// set the radio to sleep mode for now to save energy
 
@@ -93,49 +93,54 @@ void loop()
   Serial.begin(115200);
   unsigned long startMillis= millis(); // Start of sample window
   unsigned int peakToPeak = 0; // peak-to-peak level
-   
+  unsigned long integral = 0;
+  
   unsigned int signalMax = 0;
   unsigned int signalMin = 1024;
-   
-  // collect data for 50 mS
-  while (millis() - startMillis < sampleWindow)
-  {   
-    sample = analogRead(MICPIN);
-    if (sample < 1024) // toss out spurious readings
-    {
-      if (sample > signalMax)
-      {
-        signalMax = sample; // save just the max levels
-      }
-    else if (sample < signalMin)
-      {
-        signalMin = sample; // save just the min levels
-      }
-    }
-  }
-  peakToPeak = signalMax - signalMin; // max - min = peak-peak amplitude
-   
-  Serial.println(peakToPeak);
-  
-  // Set LED to previous Window's sound level.
-  analogWrite(LEDpin, peakToPeak/4);
-  
-  emontx.spl = peakToPeak;
-  emontx.uid = uid; 
-  
-  Serial.print(" "); Serial.print(emontx.uid);
-  Serial.print(" "); Serial.print(emontx.spl);
-  //Serial.print(" "); Serial.print(emontx.vbat);
-  Serial.println(); delay(100);
 
-  // because millis() returns to zero after 50 days ! 
   if (!settled && millis() > FILTERSETTLETIME) settled = true;
 
-  if (settled)                                                            // send data only after filters have settled
+  if (settled)                                                  // send data only after filters have settled
   { 
+  
+    // collect data for 50 mS
+    while (millis() - startMillis < sampleWindow)
+    {   
+      for (int i=0; i < 20 ; i++ ) {
+        sample = analogRead(MICPIN);
+        if (sample < 1024) // toss out spurious readings
+        {
+          if (sample > signalMax)
+          {
+            signalMax = sample; // save just the max levels
+          }
+        else if (sample < signalMin)
+          {
+            signalMin = sample; // save just the min levels
+          }
+        }
+      }
+      peakToPeak = signalMax - signalMin; // max - min = peak-peak amplitude
+      integral = integral + (peakToPeak/10);
+    }
+     
+    emontx.spl = integral/20;
+    emontx.uid = uid; 
+    emontx.vbat = peakToPeak;
+
+    //Serial.println(peakToPeak);
+    Serial.print("transmitted - uid:"); Serial.print(emontx.uid);
+    Serial.print(" spl:"); Serial.print(emontx.spl);
+    Serial.print(" vbat(temp p2p):"); Serial.print(emontx.vbat);
+    Serial.println();
+    
+    // Set LED to previous Window's sound level.
+    analogWrite(LEDpin, peakToPeak/4);
+     
+    delay(100);
+    
     send_rf_data();                                                       // *SEND RF DATA* - see emontx_lib
-//    analogWrite(LEDpin, (peakToPeak/4)+20); delay(20); digitalWrite(LEDpin,  (peakToPeak/4)-20);      // flash LED
-    delay(200);                                                          // delay between readings in ms
+    analogWrite(LEDpin, (peakToPeak/4)+20); delay(20); digitalWrite(LEDpin,  (peakToPeak/4)-20);      // flash LED
   }
 }
 
